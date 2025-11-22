@@ -40,7 +40,9 @@ function Sidebar() {
 
   return (
     <aside className="w-56 md:w-56 lg:w-64 bg-surface border-r border-border p-4 md:p-6 overflow-y-auto">
-      <h2 className="text-lg md:text-xl font-bold text-white mb-4 md:mb-6">Panolar</h2>
+      <h2 className="text-lg md:text-xl font-bold text-white mb-4 md:mb-6">
+        Panolar
+      </h2>
 
       <div className="space-y-1 md:space-y-2 mb-4 md:mb-6">
         {boards.map((board) => (

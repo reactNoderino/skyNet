@@ -1,8 +1,8 @@
-require('dotenv').config();
-const http = require('http');
+require("dotenv").config({ path: "../.env" });
+const http = require("http");
 
-const app = require('./app');
-const connectDatabase = require('./config/db');
+const app = require("./app");
+const connectDatabase = require("./config/db");
 
 const PORT = process.env.PORT || 5000;
 
@@ -23,11 +23,11 @@ const startServer = async () => {
       server.close(() => process.exit(0));
     };
 
-    process.on('SIGINT', gracefulShutdown);
-    process.on('SIGTERM', gracefulShutdown);
+    process.on("SIGINT", gracefulShutdown);
+    process.on("SIGTERM", gracefulShutdown);
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Sunucu başlatma hatası:', error.message);
+    console.error("Sunucu başlatma hatası:", error.message);
     process.exit(1);
   }
 };

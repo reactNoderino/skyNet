@@ -26,7 +26,9 @@ function Header() {
 
   return (
     <header className="bg-surface border-b border-border px-3 md:px-4 lg:px-6 py-3 md:py-4 flex justify-between items-center gap-2">
-      <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-white">TaskPro</h1>
+      <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-white">
+        TaskPro
+      </h1>
 
       <div className="flex items-center gap-2 md:gap-4">
         {user && (
