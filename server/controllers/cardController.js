@@ -8,19 +8,25 @@ const getCards = async (req, res) => {
     const { columnId } = req.params;
 
     const column = await Column.findById(columnId).populate("board");
-
     if (!column) {
       return res.status(404).json({ message: "Kolon bulunamadı" });
     }
 
+    if (!column.board || !column.board.owner) {
+      return res.status(400).json({ message: "Bu kolonun bağlı olduğu pano bulunamadı" });
+    }
+
+    console.log(column);
+
     // Check if board belongs to user
-    if (column.board.owner.toString() !== req.user.id) {
+    if (column.board.owner.toString() !== req.user.userId) {
       return res.status(403).json({ message: "Bu işlem için yetkiniz yok" });
     }
 
     const cards = await Card.find({ column: columnId }).sort({ order: 1 });
     res.json(cards);
   } catch (error) {
+    console.error(error); // stack trace için
     res.status(500).json({ message: error.message });
   }
 };
@@ -40,13 +46,15 @@ const createCard = async (req, res) => {
     }
 
     const column = await Column.findById(columnId).populate("board");
+    console.log(column);
+    console.log(column.board);
 
     if (!column) {
       return res.status(404).json({ message: "Kolon bulunamadı" });
     }
 
     // Check if board belongs to user
-    if (column.board.owner.toString() !== req.user.id) {
+    if (!column.board || column.board.owner.toString() !== req.user.userId) {
       return res.status(403).json({ message: "Bu işlem için yetkiniz yok" });
     }
 
@@ -97,7 +105,7 @@ const updateCard = async (req, res) => {
     }
 
     // Check if board belongs to user
-    if (card.column.board.owner.toString() !== req.user.id) {
+    if (card.column.board.owner.toString() !== req.user.userId) {
       return res.status(403).json({ message: "Bu işlem için yetkiniz yok" });
     }
 
@@ -117,9 +125,7 @@ const updateCard = async (req, res) => {
       if (deadline) {
         const parsedDeadline = new Date(deadline);
         if (parsedDeadline < new Date()) {
-          return res
-            .status(400)
-            .json({ message: "Geçmiş tarihi seçemezsiniz" });
+          return res.status(400).json({ message: "Geçmiş tarihi seçemezsiniz" });
         }
         card.deadline = parsedDeadline;
       } else {
@@ -149,7 +155,7 @@ const deleteCard = async (req, res) => {
     }
 
     // Check if board belongs to user
-    if (card.column.board.owner.toString() !== req.user.id) {
+    if (card.column.board.owner.toString() !== req.user.userId) {
       return res.status(403).json({ message: "Bu işlem için yetkiniz yok" });
     }
 
@@ -176,7 +182,7 @@ const moveCard = async (req, res) => {
     }
 
     // Check if current board belongs to user
-    if (card.column.board.owner.toString() !== req.user.id) {
+    if (card.column.board.owner.toString() !== req.user.userId) {
       return res.status(403).json({ message: "Bu işlem için yetkiniz yok" });
     }
 
@@ -187,7 +193,7 @@ const moveCard = async (req, res) => {
     }
 
     // Check if target board belongs to user
-    if (targetColumn.board.owner.toString() !== req.user.id) {
+    if (targetColumn.board.owner.toString() !== req.user.userId) {
       return res.status(403).json({ message: "Bu işlem için yetkiniz yok" });
     }
 

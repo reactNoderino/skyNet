@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const authRoutes = require("./routes/authRoutes");
 const boardRoutes = require("./routes/boardRoutes");
@@ -22,12 +24,16 @@ const parseAllowedOrigins = () => {
 const buildCorsConfig = () => {
   const allowedOrigins = parseAllowedOrigins();
 
-  if (!allowedOrigins.length) {
-    return {};
-  }
-
   return {
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("CORS error: Origin not allowed"));
+    },
     credentials: true,
   };
 };
@@ -36,10 +42,11 @@ app.use(cors(buildCorsConfig()));
 app.use(express.json({ limit: "1mb" }));
 app.use(morgan("dev"));
 
+// Routers
 app.use("/api/auth", authRoutes);
-app.use("/api", boardRoutes);
-app.use("/api", columnRoutes);
-app.use("/api", cardRoutes);
+app.use("/api/boards", boardRoutes); // board + board-column
+app.use("/api/columns", columnRoutes); // column update/delete
+app.use("/api/cards", cardRoutes); // card CRUD + move
 
 app.use((req, res, next) => {
   const error = new Error("Kaynak bulunamadı");

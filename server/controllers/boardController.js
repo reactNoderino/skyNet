@@ -3,7 +3,7 @@ const Board = require("../models/Board");
 // Get all boards for authenticated user
 const getBoards = async (req, res) => {
   try {
-    const boards = await Board.find({ owner: req.user.id });
+    const boards = await Board.find({ owner: req.user.userId });
     res.json(boards);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -21,12 +21,13 @@ const createBoard = async (req, res) => {
   try {
     const board = new Board({
       title: title.trim(),
-      owner: req.user.id,
+      owner: req.user.userId,
     });
 
     await board.save();
     res.status(201).json(board);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -41,7 +42,7 @@ const updateBoard = async (req, res) => {
   }
 
   try {
-    const board = await Board.findOne({ _id: id, owner: req.user.id });
+    const board = await Board.findOne({ _id: id, owner: req.user.userId });
 
     if (!board) {
       return res.status(404).json({ message: "Pano bulunamadı" });
@@ -60,7 +61,7 @@ const deleteBoard = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const board = await Board.findOne({ _id: id, owner: req.user.id });
+    const board = await Board.findOne({ _id: id, owner: req.user.userId });
 
     if (!board) {
       return res.status(404).json({ message: "Pano bulunamadı" });

@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchColumns,
-  createColumn,
-  updateColumn,
-  deleteColumn,
-} from "../../redux/slices/columnsSlice";
+import { fetchColumns, createColumn, updateColumn, deleteColumn } from "../../redux/slices/columnsSlice";
 import Column from "../Column/Column";
 import AddColumnModal from "../Modals/AddColumnModal";
 
@@ -59,12 +54,7 @@ function MainDashboard() {
       <div className="flex gap-3 md:gap-4 lg:gap-6 min-w-max pb-2">
         {/* Render existing columns */}
         {columns.map((column) => (
-          <Column
-            key={column._id}
-            column={column}
-            onEdit={handleEditColumn}
-            onDelete={handleDeleteColumn}
-          />
+          <Column key={column._id} column={column} onEdit={handleEditColumn} onDelete={handleDeleteColumn} />
         ))}
 
         {/* Add Column Button */}
@@ -78,11 +68,7 @@ function MainDashboard() {
 
       {/* Add Column Modal */}
       {isAddModalOpen && (
-        <AddColumnModal
-          isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
-          onSubmit={handleAddColumn}
-        />
+        <AddColumnModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} onSubmit={handleAddColumn} />
       )}
     </div>
   );

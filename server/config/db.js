@@ -1,10 +1,12 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const connectDatabase = async () => {
   const dbURI = process.env.MONGODB_URI;
 
   if (!dbURI) {
-    throw new Error('MONGODB_URI tanımlı değil');
+    throw new Error("MONGODB_URI tanımlı değil");
   }
 
   await mongoose.connect(dbURI);

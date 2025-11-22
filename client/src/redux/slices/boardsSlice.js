@@ -1,45 +1,41 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { API_BASE_URL, AUTH_STORAGE_KEY } from "../../config";
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-
-export const fetchBoards = createAsyncThunk(
-  "boards/fetchBoards",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/boards`, {
-        withCredentials: true,
-      });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
-    }
+export const fetchBoards = createAsyncThunk("boards/fetchBoards", async (_, { rejectWithValue }) => {
+  try {
+    const auth = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY));
+    const token = auth?.token;
+    const response = await axios.get(`${API_BASE_URL}/boards`, { headers: { Authorization: `Bearer ${token}` } });
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(error.response?.data || error.message);
   }
-);
+});
 
-export const createBoard = createAsyncThunk(
-  "boards/createBoard",
-  async (boardData, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/boards`, boardData, {
-        withCredentials: true,
-      });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
-    }
+export const createBoard = createAsyncThunk("boards/createBoard", async (boardData, { rejectWithValue }) => {
+  try {
+    const auth = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY));
+    const token = auth?.token;
+    const response = await axios.post(`${API_BASE_URL}/boards`, boardData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return rejectWithValue(error.response?.data || error.message);
   }
-);
+});
 
 export const updateBoard = createAsyncThunk(
   "boards/updateBoard",
   async ({ boardId, boardData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(
-        `${API_BASE_URL}/boards/${boardId}`,
-        boardData,
-        { withCredentials: true }
-      );
+      const auth = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY));
+      const token = auth?.token;
+      const response = await axios.put(`${API_BASE_URL}/boards/${boardId}`, boardData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -47,19 +43,16 @@ export const updateBoard = createAsyncThunk(
   }
 );
 
-export const deleteBoard = createAsyncThunk(
-  "boards/deleteBoard",
-  async (boardId, { rejectWithValue }) => {
-    try {
-      await axios.delete(`${API_BASE_URL}/boards/${boardId}`, {
-        withCredentials: true,
-      });
-      return boardId;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
-    }
+export const deleteBoard = createAsyncThunk("boards/deleteBoard", async (boardId, { rejectWithValue }) => {
+  try {
+    const auth = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY));
+    const token = auth?.token;
+    await axios.delete(`${API_BASE_URL}/boards/${boardId}`, { headers: { Authorization: `Bearer ${token}` } });
+    return boardId;
+  } catch (error) {
+    return rejectWithValue(error.response?.data || error.message);
   }
-);
+});
 
 const boardsSlice = createSlice({
   name: "boards",
@@ -108,9 +101,7 @@ const boardsSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(updateBoard.fulfilled, (state, action) => {
-        const index = state.items.findIndex(
-          (board) => board._id === action.payload._id
-        );
+        const index = state.items.findIndex((board) => board._id === action.payload._id);
         if (index !== -1) {
           state.items[index] = action.payload;
         }
@@ -119,9 +110,7 @@ const boardsSlice = createSlice({
         }
       })
       .addCase(deleteBoard.fulfilled, (state, action) => {
-        state.items = state.items.filter(
-          (board) => board._id !== action.payload
-        );
+        state.items = state.items.filter((board) => board._id !== action.payload);
         if (state.currentBoard?._id === action.payload) {
           state.currentBoard = state.items[0] || null;
         }

@@ -2,16 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCards, createCard } from "../../redux/slices/cardsSlice";
 import Card from "../Card/Card";
-import AddCardModal from "../Modals/AddCardModal";
+import AddCardModal from "../Modals/AddCardModal/AddCardModal.jsx";
+import { selectCardsByColumn } from "../../redux/selectors/columnsSelectors.js";
+import EditColumnModal from "../Modals/EditColumnModal/EditColumnModal.jsx";
+import { updateColumn } from "../../redux/slices/columnsSlice.js";
 
 function Column({ column, onEdit, onDelete }) {
   const dispatch = useDispatch();
-  const cards = useSelector(
-    (state) => state.cards.itemsByColumn[column._id] || []
-  );
+  const selectCards = selectCardsByColumn();
+  const cards = useSelector((state) => selectCards(state, column._id));
+
   const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
   const [isEditColumnOpen, setIsEditColumnOpen] = useState(false);
-  const [editTitle, setEditTitle] = useState(column.title);
 
   useEffect(() => {
     dispatch(fetchCards(column._id));
@@ -27,10 +29,15 @@ function Column({ column, onEdit, onDelete }) {
     setIsAddCardModalOpen(false);
   };
 
-  const handleEditColumnTitle = () => {
-    if (editTitle.trim() !== column.title) {
-      onEdit(column._id, editTitle.trim());
+  const handleEditColumnTitle = (newTitle) => {
+    newTitle = newTitle.trim();
+
+    if (!newTitle || newTitle === column.title) {
+      setIsEditColumnOpen(false);
+      return;
     }
+
+    onEdit(column._id, newTitle);
     setIsEditColumnOpen(false);
   };
 
@@ -38,20 +45,15 @@ function Column({ column, onEdit, onDelete }) {
     <div className="flex-shrink-0 w-64 md:w-72 lg:w-80 bg-surface rounded-lg border border-border flex flex-col h-full">
       {/* Column Header */}
       <div className="p-3 md:p-4 border-b border-border flex justify-between items-center gap-2">
-        {isEditColumnOpen ? (
-          <input
-            type="text"
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-            onBlur={handleEditColumnTitle}
-            autoFocus
-            className="input-field text-xs md:text-sm flex-1"
+        {isEditColumnOpen && (
+          <EditColumnModal
+            currentTitle={column.title}
+            onSubmit={handleEditColumnTitle}
+            onClose={() => setIsEditColumnOpen(false)}
           />
-        ) : (
-          <h3 className="text-base md:text-lg font-semibold text-white line-clamp-1">
-            {column.title}
-          </h3>
         )}
+
+        <h3 className="text-base md:text-lg font-semibold text-white line-clamp-1">{column.title}</h3>
 
         <div className="flex gap-1 md:gap-2 flex-shrink-0">
           <button
@@ -74,13 +76,9 @@ function Column({ column, onEdit, onDelete }) {
       {/* Cards Container - with scrolling */}
       <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-2 md:space-y-3">
         {cards.length > 0 ? (
-          cards.map((card) => (
-            <Card key={card._id} card={card} columnId={column._id} />
-          ))
+          cards.map((card) => <Card key={card._id} card={card} columnId={column._id} />)
         ) : (
-          <p className="text-text-secondary text-xs md:text-sm text-center py-8">
-            Kart yok
-          </p>
+          <p className="text-text-secondary text-xs md:text-sm text-center py-8">Kart yok</p>
         )}
       </div>
 

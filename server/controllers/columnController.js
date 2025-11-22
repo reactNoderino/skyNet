@@ -8,9 +8,15 @@ const getColumns = async (req, res) => {
     const { boardId } = req.params;
 
     // Check if board exists and belongs to user
-    const board = await Board.findOne({ _id: boardId, owner: req.user.id });
+    const board = await Board.findById(boardId);
+    console.log(board.createdBy);
+
     if (!board) {
       return res.status(404).json({ message: "Pano bulunamadı" });
+    }
+
+    if (board.owner.toString() !== req.user.userId) {
+      return res.status(403).json({ message: "Bu işlemi yapmaya yetkiniz yok" });
     }
 
     const columns = await Column.find({ board: boardId }).sort({ order: 1 });
@@ -31,7 +37,8 @@ const createColumn = async (req, res) => {
     }
 
     // Check if board exists and belongs to user
-    const board = await Board.findOne({ _id: boardId, owner: req.user.id });
+    const board = await Board.findOne({ _id: boardId, owner: req.user.userId });
+
     if (!board) {
       return res.status(404).json({ message: "Pano bulunamadı" });
     }
@@ -72,7 +79,7 @@ const updateColumn = async (req, res) => {
     }
 
     // Check if board belongs to user
-    if (column.board.owner.toString() !== req.user.id) {
+    if (column.board.owner.toString() !== req.user.userId) {
       return res.status(403).json({ message: "Bu işlem için yetkiniz yok" });
     }
 
@@ -96,7 +103,7 @@ const deleteColumn = async (req, res) => {
     }
 
     // Check if board belongs to user
-    if (column.board.owner.toString() !== req.user.id) {
+    if (column.board.owner.toString() !== req.user.userId) {
       return res.status(403).json({ message: "Bu işlem için yetkiniz yok" });
     }
 

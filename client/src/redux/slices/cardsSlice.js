@@ -1,84 +1,73 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { API_BASE_URL, AUTH_STORAGE_KEY } from "../../config";
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-
-export const fetchCards = createAsyncThunk(
-  "cards/fetchCards",
-  async (columnId, { rejectWithValue }) => {
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}/columns/${columnId}/cards`,
-        { withCredentials: true }
-      );
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
-    }
+export const fetchCards = createAsyncThunk("cards/fetchCards", async (columnId, { rejectWithValue }) => {
+  try {
+    const auth = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY));
+    const token = auth?.token;
+    const response = await axios.get(`${API_BASE_URL}/columns/${columnId}/cards`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(error.response?.data || error.message);
   }
-);
+});
 
-export const createCard = createAsyncThunk(
-  "cards/createCard",
-  async ({ columnId, cardData }, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/columns/${columnId}/cards`,
-        cardData,
-        { withCredentials: true }
-      );
-      return { ...response.data, columnId };
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
-    }
+export const createCard = createAsyncThunk("cards/createCard", async ({ columnId, cardData }, { rejectWithValue }) => {
+  try {
+    const auth = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY));
+    const token = auth?.token;
+    const response = await axios.post(`${API_BASE_URL}/columns/${columnId}/cards`, cardData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return { ...response.data, columnId };
+  } catch (error) {
+    return rejectWithValue(error.response?.data || error.message);
   }
-);
+});
 
-export const updateCard = createAsyncThunk(
-  "cards/updateCard",
-  async ({ cardId, cardData }, { rejectWithValue }) => {
-    try {
-      const response = await axios.put(
-        `${API_BASE_URL}/cards/${cardId}`,
-        cardData,
-        { withCredentials: true }
-      );
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
-    }
+export const updateCard = createAsyncThunk("cards/updateCard", async ({ cardId, cardData }, { rejectWithValue }) => {
+  try {
+    const auth = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY));
+    const token = auth?.token;
+    const response = await axios.put(`${API_BASE_URL}/cards/${cardId}`, cardData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(error.response?.data || error.message);
   }
-);
+});
 
-export const deleteCard = createAsyncThunk(
-  "cards/deleteCard",
-  async (cardId, { rejectWithValue }) => {
-    try {
-      await axios.delete(`${API_BASE_URL}/cards/${cardId}`, {
-        withCredentials: true,
-      });
-      return cardId;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
-    }
+export const deleteCard = createAsyncThunk("cards/deleteCard", async (cardId, { rejectWithValue }) => {
+  try {
+    const auth = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY));
+    const token = auth?.token;
+    await axios.delete(`${API_BASE_URL}/cards/${cardId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return cardId;
+  } catch (error) {
+    return rejectWithValue(error.response?.data || error.message);
   }
-);
+});
 
-export const moveCard = createAsyncThunk(
-  "cards/moveCard",
-  async ({ cardId, newColumnId }, { rejectWithValue }) => {
-    try {
-      const response = await axios.patch(
-        `${API_BASE_URL}/cards/${cardId}/move`,
-        { columnId: newColumnId },
-        { withCredentials: true }
-      );
-      return { ...response.data, newColumnId };
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
-    }
+export const moveCard = createAsyncThunk("cards/moveCard", async ({ cardId, newColumnId }, { rejectWithValue }) => {
+  try {
+    const auth = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY));
+    const token = auth?.token;
+    const response = await axios.patch(
+      `${API_BASE_URL}/cards/${cardId}/move`,
+      { columnId: newColumnId },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return { ...response.data, newColumnId };
+  } catch (error) {
+    return rejectWithValue(error.response?.data || error.message);
   }
-);
+});
 
 const cardsSlice = createSlice({
   name: "cards",
@@ -120,9 +109,7 @@ const cardsSlice = createSlice({
       })
       .addCase(updateCard.fulfilled, (state, action) => {
         Object.keys(state.itemsByColumn).forEach((columnId) => {
-          const index = state.itemsByColumn[columnId].findIndex(
-            (card) => card._id === action.payload._id
-          );
+          const index = state.itemsByColumn[columnId].findIndex((card) => card._id === action.payload._id);
           if (index !== -1) {
             state.itemsByColumn[columnId][index] = action.payload;
           }
@@ -130,9 +117,7 @@ const cardsSlice = createSlice({
       })
       .addCase(deleteCard.fulfilled, (state, action) => {
         Object.keys(state.itemsByColumn).forEach((columnId) => {
-          state.itemsByColumn[columnId] = state.itemsByColumn[columnId].filter(
-            (card) => card._id !== action.payload
-          );
+          state.itemsByColumn[columnId] = state.itemsByColumn[columnId].filter((card) => card._id !== action.payload);
         });
       })
       .addCase(moveCard.fulfilled, (state, action) => {

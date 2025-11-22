@@ -1,20 +1,16 @@
 const express = require("express");
 const authenticateToken = require("../middleware/authenticateToken");
-const {
-  getColumns,
-  createColumn,
-  updateColumn,
-  deleteColumn,
-} = require("../controllers/columnController");
+const { updateColumn, deleteColumn } = require("../controllers/columnController");
+const { getCards, createCard } = require("../controllers/cardController");
 
 const router = express.Router();
 
-// Boards routes
-router.get("/boards/:boardId/columns", authenticateToken, getColumns);
-router.post("/boards/:boardId/columns", authenticateToken, createColumn);
+// GET and CREATE Cards by column
+router.get("/:columnId/cards", authenticateToken, getCards);
+router.post("/:columnId/cards", authenticateToken, createCard);
 
-// Column routes
-router.put("/columns/:columnId", authenticateToken, updateColumn);
-router.delete("/columns/:columnId", authenticateToken, deleteColumn);
+// UPDATE and DELETE
+router.put("/:columnId", authenticateToken, updateColumn);
+router.delete("/:columnId", authenticateToken, deleteColumn);
 
 module.exports = router;
