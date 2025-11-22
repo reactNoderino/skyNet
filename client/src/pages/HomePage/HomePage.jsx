@@ -30,8 +30,10 @@ function HomePage() {
       <Header />
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar - fixed on left */}
-        <Sidebar />
+        {/* Sidebar - hidden on mobile, visible on md+ */}
+        <div className="hidden md:block md:w-56 lg:w-64">
+          <Sidebar />
+        </div>
 
         {/* Main Content - scrollable */}
         <MainDashboard />

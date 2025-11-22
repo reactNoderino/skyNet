@@ -35,9 +35,9 @@ function Column({ column, onEdit, onDelete }) {
   };
 
   return (
-    <div className="flex-shrink-0 w-80 bg-surface rounded-lg border border-border flex flex-col">
+    <div className="flex-shrink-0 w-64 md:w-72 lg:w-80 bg-surface rounded-lg border border-border flex flex-col h-full">
       {/* Column Header */}
-      <div className="p-4 border-b border-border flex justify-between items-center">
+      <div className="p-3 md:p-4 border-b border-border flex justify-between items-center gap-2">
         {isEditColumnOpen ? (
           <input
             type="text"
@@ -45,23 +45,25 @@ function Column({ column, onEdit, onDelete }) {
             onChange={(e) => setEditTitle(e.target.value)}
             onBlur={handleEditColumnTitle}
             autoFocus
-            className="input-field text-sm flex-1"
+            className="input-field text-xs md:text-sm flex-1"
           />
         ) : (
-          <h3 className="text-lg font-semibold text-white">{column.title}</h3>
+          <h3 className="text-base md:text-lg font-semibold text-white line-clamp-1">
+            {column.title}
+          </h3>
         )}
 
-        <div className="flex gap-2 ml-2">
+        <div className="flex gap-1 md:gap-2 flex-shrink-0">
           <button
             onClick={() => setIsEditColumnOpen(true)}
-            className="text-gray-400 hover:text-white p-1"
+            className="text-gray-400 hover:text-white p-1 text-sm md:text-base"
             title="Düzenle"
           >
             ✎
           </button>
           <button
             onClick={() => onDelete(column._id)}
-            className="text-gray-400 hover:text-red-500 p-1"
+            className="text-gray-400 hover:text-red-500 p-1 text-sm md:text-base"
             title="Sil"
           >
             ✕
@@ -70,23 +72,23 @@ function Column({ column, onEdit, onDelete }) {
       </div>
 
       {/* Cards Container - with scrolling */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-2 md:space-y-3">
         {cards.length > 0 ? (
           cards.map((card) => (
             <Card key={card._id} card={card} columnId={column._id} />
           ))
         ) : (
-          <p className="text-text-secondary text-sm text-center py-8">
+          <p className="text-text-secondary text-xs md:text-sm text-center py-8">
             Kart yok
           </p>
         )}
       </div>
 
       {/* Add Card Button - sticky at bottom */}
-      <div className="p-4 border-t border-border">
+      <div className="p-3 md:p-4 border-t border-border flex-shrink-0">
         <button
           onClick={() => setIsAddCardModalOpen(true)}
-          className="w-full px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition text-sm font-medium"
+          className="w-full px-3 md:px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition text-xs md:text-sm font-medium"
         >
           + Add another card
         </button>

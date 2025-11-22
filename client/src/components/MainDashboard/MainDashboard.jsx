@@ -55,8 +55,8 @@ function MainDashboard() {
   }
 
   return (
-    <div className="flex-1 overflow-x-auto bg-background p-6">
-      <div className="flex gap-6 min-w-max">
+    <div className="flex-1 overflow-x-auto overflow-y-hidden bg-background p-3 md:p-4 lg:p-6">
+      <div className="flex gap-3 md:gap-4 lg:gap-6 min-w-max pb-2">
         {/* Render existing columns */}
         {columns.map((column) => (
           <Column
@@ -70,7 +70,7 @@ function MainDashboard() {
         {/* Add Column Button */}
         <button
           onClick={() => setIsAddModalOpen(true)}
-          className="flex-shrink-0 w-72 h-12 rounded-lg bg-surface border border-border hover:border-blue-500 transition flex items-center justify-center text-text-secondary hover:text-white cursor-pointer"
+          className="flex-shrink-0 w-64 md:w-72 h-10 md:h-12 rounded-lg bg-surface border border-border hover:border-blue-500 transition flex items-center justify-center text-text-secondary hover:text-white cursor-pointer text-sm md:text-base"
         >
           + Add Column
         </button>

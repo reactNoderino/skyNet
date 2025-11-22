@@ -41,28 +41,28 @@ function Card({ card, columnId }) {
 
   return (
     <>
-      <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-blue-500 transition">
+      <div className="bg-gray-800 rounded-lg p-3 md:p-4 border border-gray-700 hover:border-blue-500 transition">
         {/* Title */}
-        <h4 className="text-white font-semibold text-sm mb-2 line-clamp-2">
+        <h4 className="text-white font-semibold text-xs md:text-sm mb-2 line-clamp-2">
           {card.title}
         </h4>
 
         {/* Description */}
-        <p className="text-text-secondary text-xs mb-3 line-clamp-3">
+        <p className="text-text-secondary text-xs mb-3 line-clamp-2 md:line-clamp-3">
           {card.description}
         </p>
 
         {/* Priority & Deadline */}
-        <div className="flex items-center justify-between mb-3 text-xs">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between mb-3 text-xs gap-1">
+          <div className="flex items-center gap-1 md:gap-2 flex-1 min-w-0">
             <div
-              className="w-3 h-3 rounded-full"
+              className="w-2 md:w-3 h-2 md:h-3 rounded-full flex-shrink-0"
               style={{
                 backgroundColor:
                   PRIORITY_COLORS[card.priority] || PRIORITY_COLORS.none,
               }}
             />
-            <span className="text-gray-400">
+            <span className="text-gray-400 truncate text-xs">
               {card.priority === "none"
                 ? "Önceliksiz"
                 : card.priority === "low"
@@ -73,16 +73,18 @@ function Card({ card, columnId }) {
             </span>
           </div>
           {card.deadline && (
-            <span className="text-gray-400">{formatDate(card.deadline)}</span>
+            <span className="text-gray-400 text-xs flex-shrink-0">
+              {formatDate(card.deadline)}
+            </span>
           )}
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        <div className="flex gap-1 md:gap-2">
           {/* Move Button */}
           <button
             onClick={() => setShowMoveTooltip(!showMoveTooltip)}
-            className="flex-1 p-2 rounded hover:bg-gray-700 transition text-gray-400 hover:text-white relative"
+            className="flex-1 p-1 md:p-2 rounded hover:bg-gray-700 transition text-gray-400 hover:text-white relative text-xs md:text-base"
             title="Kolona taşı"
           >
             ⇄
@@ -99,7 +101,7 @@ function Card({ card, columnId }) {
           {/* Edit Button */}
           <button
             onClick={() => setIsEditModalOpen(true)}
-            className="flex-1 p-2 rounded hover:bg-gray-700 transition text-gray-400 hover:text-white"
+            className="flex-1 p-1 md:p-2 rounded hover:bg-gray-700 transition text-gray-400 hover:text-white text-xs md:text-base"
             title="Düzenle"
           >
             ✎
@@ -108,7 +110,7 @@ function Card({ card, columnId }) {
           {/* Delete Button */}
           <button
             onClick={handleDelete}
-            className="flex-1 p-2 rounded hover:bg-gray-700 transition text-gray-400 hover:text-red-500"
+            className="flex-1 p-1 md:p-2 rounded hover:bg-gray-700 transition text-gray-400 hover:text-red-500 text-xs md:text-base"
             title="Sil"
           >
             ✕
@@ -117,7 +119,7 @@ function Card({ card, columnId }) {
           {/* Bell Button (if deadline is today) */}
           {isDeadlineToday() && (
             <button
-              className="flex-1 p-2 rounded bg-yellow-600 hover:bg-yellow-700 transition text-white"
+              className="flex-1 p-1 md:p-2 rounded bg-yellow-600 hover:bg-yellow-700 transition text-white text-xs md:text-base"
               title="Bugün son tarih"
             >
               🔔
