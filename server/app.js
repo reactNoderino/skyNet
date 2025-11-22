@@ -1,8 +1,11 @@
-const express = require('express');
-const cors = require('cors');
-const morgan = require('morgan');
+const express = require("express");
+const cors = require("cors");
+const morgan = require("morgan");
 
-const authRoutes = require('./routes/authRoutes');
+const authRoutes = require("./routes/authRoutes");
+const boardRoutes = require("./routes/boardRoutes");
+const columnRoutes = require("./routes/columnRoutes");
+const cardRoutes = require("./routes/cardRoutes");
 
 const app = express();
 
@@ -11,7 +14,7 @@ const parseAllowedOrigins = () => {
     return [];
   }
 
-  return process.env.CLIENT_URL.split(',')
+  return process.env.CLIENT_URL.split(",")
     .map((origin) => origin.trim())
     .filter(Boolean);
 };
@@ -30,13 +33,16 @@ const buildCorsConfig = () => {
 };
 
 app.use(cors(buildCorsConfig()));
-app.use(express.json({ limit: '1mb' }));
-app.use(morgan('dev'));
+app.use(express.json({ limit: "1mb" }));
+app.use(morgan("dev"));
 
-app.use('/api/auth', authRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api", boardRoutes);
+app.use("/api", columnRoutes);
+app.use("/api", cardRoutes);
 
 app.use((req, res, next) => {
-  const error = new Error('Kaynak bulunamadı');
+  const error = new Error("Kaynak bulunamadı");
   error.statusCode = 404;
   next(error);
 });
@@ -45,10 +51,10 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const response = {
-    message: err.message || 'Sunucuda beklenmeyen bir hata oluştu',
+    message: err.message || "Sunucuda beklenmeyen bir hata oluştu",
   };
 
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     response.stack = err.stack;
   }
 

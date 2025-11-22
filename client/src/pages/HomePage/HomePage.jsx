@@ -1,60 +1,41 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styles from './HomePage.module.css';
-import { API_BASE_URL, AUTH_STORAGE_KEY } from '../../config';
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchBoards } from "../../redux/slices/boardsSlice";
+import Header from "../../components/Header/Header";
+import Sidebar from "../../components/Sidebar/Sidebar";
+import MainDashboard from "../../components/MainDashboard/MainDashboard";
 
 function HomePage() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
+  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { items: boards } = useSelector((state) => state.boards);
 
-  const handleLogout = async () => {
-    if (isLoading) {
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/welcome", { replace: true });
       return;
     }
+    dispatch(fetchBoards());
+  }, [isAuthenticated, dispatch, navigate]);
 
-    setIsLoading(true);
-
-    let refreshToken = '';
-
-    try {
-      const storedAuth = localStorage.getItem(AUTH_STORAGE_KEY);
-      if (storedAuth) {
-        const parsedAuth = JSON.parse(storedAuth);
-        refreshToken = parsedAuth?.refreshToken || '';
-      }
-    } catch (error) {
-      console.error('Failed to parse auth storage:', error);
-    }
-
-    const logoutPayload = refreshToken ? { refreshToken } : {};
-
-    try {
-      await fetch(`${API_BASE_URL}/auth/logout`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(logoutPayload),
-      });
-    } catch (error) {
-      console.error('Logout request failed:', error);
-      window.alert('Sunucuya ulaşılamadı. Yerel olarak çıkış yapılıyor.');
-    } finally {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
-      setIsLoading(false);
-      navigate('/welcome', { replace: true });
-    }
-  };
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
-    <div className={styles.homePage}>
-      <button
-        type="button"
-        className={styles.logoutButton}
-        onClick={handleLogout}
-        disabled={isLoading}
-      >
-        {isLoading ? 'Logging out...' : 'Log Out'}
-      </button>
+    <div className="flex flex-col h-screen bg-background">
+      {/* Header - fixed at top */}
+      <Header />
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar - fixed on left */}
+        <Sidebar />
+
+        {/* Main Content - scrollable */}
+        <MainDashboard />
+      </div>
     </div>
   );
 }
