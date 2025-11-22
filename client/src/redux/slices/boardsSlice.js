@@ -69,6 +69,14 @@ const boardsSlice = createSlice({
     isLoading: false,
     error: null,
   },
+  reducers: {
+    selectBoard: (state, action) => {
+      const board = state.items.find((b) => b._id === action.payload);
+      if (board) {
+        state.currentBoard = board;
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchBoards.pending, (state) => {
@@ -100,7 +108,9 @@ const boardsSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(updateBoard.fulfilled, (state, action) => {
-        const index = state.items.findIndex((board) => board._id === action.payload._id);
+        const index = state.items.findIndex(
+          (board) => board._id === action.payload._id
+        );
         if (index !== -1) {
           state.items[index] = action.payload;
         }
@@ -109,7 +119,9 @@ const boardsSlice = createSlice({
         }
       })
       .addCase(deleteBoard.fulfilled, (state, action) => {
-        state.items = state.items.filter((board) => board._id !== action.payload);
+        state.items = state.items.filter(
+          (board) => board._id !== action.payload
+        );
         if (state.currentBoard?._id === action.payload) {
           state.currentBoard = state.items[0] || null;
         }
@@ -117,4 +129,5 @@ const boardsSlice = createSlice({
   },
 });
 
+export const { selectBoard } = boardsSlice.actions;
 export default boardsSlice.reducer;

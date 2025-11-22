@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBoards, createBoard } from "../../redux/slices/boardsSlice";
-import { fetchColumns } from "../../redux/slices/columnsSlice";
+import { createBoard, selectBoard } from "../../redux/slices/boardsSlice";
 import * as yup from "yup";
 
 const boardSchema = yup.object({
@@ -17,10 +16,7 @@ function Sidebar() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSelectBoard = (boardId) => {
-    const board = boards.find((b) => b._id === boardId);
-    if (board) {
-      dispatch(fetchColumns(boardId));
-    }
+    dispatch(selectBoard(boardId));
   };
 
   const handleAddBoard = async (e) => {
