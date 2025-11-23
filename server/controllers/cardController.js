@@ -76,7 +76,7 @@ const createCard = async (req, res) => {
     const card = new Card({
       title: title.trim(),
       description: description.trim(),
-      priority: priority || "none",
+      priority: priority || "Without",
       deadline: parsedDeadline,
       column: columnId,
       order: newOrder,

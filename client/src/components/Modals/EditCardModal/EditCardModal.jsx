@@ -1,23 +1,22 @@
 import React, { useState } from "react";
-import DatePicker from "react-datepicker";
 import * as yup from "yup";
-import styles from "./AddCardModal.module.css";
 import { Calendar } from "../Calendar/Calendar";
+import styles from "./EditCardModal.module.css";
 import { LABELS } from "../../../config";
 
 const cardSchema = yup.object({
   title: yup.string().required("Title is required").trim(),
   description: yup.string().required("Description is required").trim(),
-  priority: yup.string().oneOf(["Low", "Medium", "High", "Without"]).default("none"),
+  priority: yup.string().oneOf(["Low", "Medium", "High", "Without"]).default("Without"),
   deadline: yup.date().nullable().min(new Date(), "You cannot select a past date"),
 });
 
-function AddCardModal({ isOpen, onClose, onSubmit }) {
+function EditCardModal({ isOpen, onClose, card, onSubmit }) {
   const initialState = {
-    title: "",
-    description: "",
-    priority: "Without",
-    deadline: new Date(),
+    title: card?.title || "",
+    description: card?.description || "",
+    priority: card?.priority || "Without",
+    deadline: card?.deadline ? new Date(card.deadline) : new Date(),
   };
 
   const [formData, setFormData] = useState(initialState);
@@ -38,16 +37,17 @@ function AddCardModal({ isOpen, onClose, onSubmit }) {
       });
 
       onSubmit({
+        ...card,
         title: validatedData.title.trim(),
         description: validatedData.description.trim(),
         priority: validatedData.priority,
         deadline: validatedData.deadline ? validatedData.deadline.toISOString() : null,
       });
 
-      setFormData(initialState);
+      setIsSubmitting(false);
+      onClose();
     } catch (error) {
       if (error.path) setErrors({ [error.path]: error.message });
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -61,9 +61,10 @@ function AddCardModal({ isOpen, onClose, onSubmit }) {
           &times;
         </button>
 
-        <h2 className={styles.addCardModalHeader}>Add Card</h2>
+        <h2 className={styles.addCardModalHeader}>Edit Card</h2>
 
         <form onSubmit={handleSubmit}>
+          {/* Title */}
           <div className={styles.formGroup}>
             <input
               type="text"
@@ -76,6 +77,7 @@ function AddCardModal({ isOpen, onClose, onSubmit }) {
             {errors.title && <p className={styles.errorMessage}>{errors.title}</p>}
           </div>
 
+          {/* Description */}
           <div className={styles.formGroup}>
             <textarea
               value={formData.description}
@@ -87,6 +89,7 @@ function AddCardModal({ isOpen, onClose, onSubmit }) {
             {errors.description && <p className={styles.errorMessage}>{errors.description}</p>}
           </div>
 
+          {/* Priority */}
           <div className={styles.formGroup}>
             <p className={styles.labelTitle}>Label Color</p>
             <div className={styles.labelContainer}>
@@ -98,6 +101,7 @@ function AddCardModal({ isOpen, onClose, onSubmit }) {
                     value={label.name}
                     checked={formData.priority === label.name}
                     onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                    disabled={isSubmitting}
                   />
                   <span style={{ background: label.color }}></span>
                 </label>
@@ -105,6 +109,7 @@ function AddCardModal({ isOpen, onClose, onSubmit }) {
             </div>
           </div>
 
+          {/* Deadline */}
           <div className={styles.formGroup}>
             <label className={styles.labelTitle}>Deadline</label>
             <Calendar
@@ -114,10 +119,10 @@ function AddCardModal({ isOpen, onClose, onSubmit }) {
             {errors.deadline && <p className={styles.errorMessage}>{errors.deadline}</p>}
           </div>
 
+          {/* Buttons */}
           <div className={styles.buttonContainer}>
             <button type="submit" className={styles.btnPrimary} disabled={isSubmitting}>
-              <span>+</span>
-              {isSubmitting ? "Adding..." : "Add"}
+              {isSubmitting ? "Saving..." : "Save"}
             </button>
           </div>
         </form>
@@ -126,4 +131,4 @@ function AddCardModal({ isOpen, onClose, onSubmit }) {
   );
 }
 
-export default AddCardModal;
+export default EditCardModal;

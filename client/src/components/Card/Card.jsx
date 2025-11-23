@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { deleteCard, moveCard } from "../../redux/slices/cardsSlice";
 import { PRIORITY_COLORS } from "../../config";
 import MoveCardTooltip from "./MoveCardTooltip";
-import EditCardModal from "../Modals/EditCardModal";
+import EditCardModal from "../Modals/EditCardModal/EditCardModal";
 
 function Card({ card, columnId }) {
   const dispatch = useDispatch();
@@ -43,14 +43,10 @@ function Card({ card, columnId }) {
     <>
       <div className="bg-gray-800 rounded-lg p-3 md:p-4 border border-gray-700 hover:border-blue-500 transition">
         {/* Title */}
-        <h4 className="text-white font-semibold text-xs md:text-sm mb-2 line-clamp-2">
-          {card.title}
-        </h4>
+        <h4 className="text-white font-semibold text-xs md:text-sm mb-2 line-clamp-2">{card.title}</h4>
 
         {/* Description */}
-        <p className="text-text-secondary text-xs mb-3 line-clamp-2 md:line-clamp-3">
-          {card.description}
-        </p>
+        <p className="text-text-secondary text-xs mb-3 line-clamp-2 md:line-clamp-3">{card.description}</p>
 
         {/* Priority & Deadline */}
         <div className="flex items-center justify-between mb-3 text-xs gap-1">
@@ -58,8 +54,7 @@ function Card({ card, columnId }) {
             <div
               className="w-2 md:w-3 h-2 md:h-3 rounded-full flex-shrink-0"
               style={{
-                backgroundColor:
-                  PRIORITY_COLORS[card.priority] || PRIORITY_COLORS.none,
+                backgroundColor: PRIORITY_COLORS[card.priority] || PRIORITY_COLORS.none,
               }}
             />
             <span className="text-gray-400 truncate text-xs">
@@ -72,11 +67,7 @@ function Card({ card, columnId }) {
                 : "Yüksek"}
             </span>
           </div>
-          {card.deadline && (
-            <span className="text-gray-400 text-xs flex-shrink-0">
-              {formatDate(card.deadline)}
-            </span>
-          )}
+          {card.deadline && <span className="text-gray-400 text-xs flex-shrink-0">{formatDate(card.deadline)}</span>}
         </div>
 
         {/* Action Buttons */}
@@ -130,11 +121,7 @@ function Card({ card, columnId }) {
 
       {/* Edit Card Modal */}
       {isEditModalOpen && (
-        <EditCardModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          card={card}
-        />
+        <EditCardModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} card={card} />
       )}
     </>
   );

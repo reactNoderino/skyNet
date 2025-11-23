@@ -16,8 +16,8 @@ const cardSchema = new mongoose.Schema(
     },
     priority: {
       type: String,
-      enum: ["none", "low", "medium", "high"],
-      default: "none",
+      enum: ["Low", "Medium", "High", "Without"],
+      default: "Without",
     },
     deadline: {
       type: Date,

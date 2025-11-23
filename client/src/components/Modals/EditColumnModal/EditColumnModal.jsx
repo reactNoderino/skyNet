@@ -29,7 +29,7 @@ const EditColumnModal = ({ currentTitle, onSubmit, onClose }) => {
           <input className={styles.editModalFormInput} type="text" value={newTitle} onChange={handleSetTitle} />
           <button className={styles.addButton} type="submit">
             <span style={{ fontSize: 18, marginRight: 8 }}>+</span>
-            {loading ? "Updating..." : "Add"}
+            {loading ? "Updating..." : "Edit"}
           </button>
         </form>
       </div>

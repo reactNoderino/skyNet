@@ -5,6 +5,7 @@ const getBoards = async (req, res) => {
   try {
     const boards = await Board.find({ owner: req.user.userId });
     res.json(boards);
+    console.log(boards);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
