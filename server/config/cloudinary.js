@@ -1,7 +1,9 @@
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const multer = require('multer');
-require('dotenv').config();
+import dotenv from "dotenv";
+dotenv.config();
+
+import { v2 as cloudinary } from "cloudinary";
+import CloudinaryStorage from "multer-storage-cloudinary";
+import multer from "multer";
 
 // Cloudinary Bağlantı Ayarları
 cloudinary.config({
@@ -12,14 +14,14 @@ cloudinary.config({
 
 // Storage Motoru (Yükleme Kuralları)
 const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
+  cloudinary,
   params: {
-    folder: 'TaskProFolder', // <-- BURASI TaskProFolder OLMALI
-    allowed_formats: ['jpg', 'png', 'jpeg'],
-    public_id: (req, file) => `custom_${Date.now()}`, 
+    folder: "TaskProFolder",
+    allowed_formats: ["jpg", "png", "jpeg"],
+    public_id: (req, file) => `custom_${Date.now()}`,
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
-module.exports = upload;
+export default upload;

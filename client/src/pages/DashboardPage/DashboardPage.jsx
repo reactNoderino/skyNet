@@ -6,19 +6,41 @@ import NewBoardModal from "../../components/DashboardForm/NewBoardModal";
 import DeleteModal from "../../components/DashboardForm/DeleteModal";
 import AddColumnModal from "../../components/Modals/AddColumnModal/AddColumnModal";
 import Column from "../../components/Column/Column.jsx";
-import { fetchBoards, createBoard, updateBoard, deleteBoard, selectBoard } from "../../redux/slices/boardsSlice";
-import { createColumn, deleteColumn, fetchColumns, updateColumn } from "../../redux/slices/columnsSlice.js";
-import { AUTH_STORAGE_KEY, CLOUDINARY_BASE_URL, API_BASE_URL } from "../../config";
+import {
+  fetchBoards,
+  createBoard,
+  updateBoard,
+  deleteBoard,
+  selectBoard,
+} from "../../redux/slices/boardsSlice";
+import {
+  createColumn,
+  deleteColumn,
+  fetchColumns,
+  updateColumn,
+} from "../../redux/slices/columnsSlice.js";
+import {
+  AUTH_STORAGE_KEY,
+  CLOUDINARY_BASE_URL,
+  API_BASE_URL,
+} from "../../config";
 import styles from "./DashboardPage.module.css";
 import HomePage from "../HomePage/HomePage.jsx";
+import Navbar from "../../components/Header/Navbar.jsx";
 
 function DashboardPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   // 💡 Board ve Kolon verileri Redux'tan çekildi
-  const { items: userBoards, currentBoard, isLoading: loadingBoards } = useSelector((state) => state.boards);
-  const { items: columnsData, isLoading: loadingColumns } = useSelector((state) => state.columns);
+  const {
+    items: userBoards,
+    currentBoard,
+    isLoading: loadingBoards,
+  } = useSelector((state) => state.boards);
+  const { items: columnsData, isLoading: loadingColumns } = useSelector(
+    (state) => state.columns
+  );
 
   // 💡 isDeleteModalToOpen tutarlılığı sağlandı.
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -83,7 +105,9 @@ function DashboardPage() {
   };
 
   const handleBoardUpdated = (updatedBoard) => {
-    dispatch(updateBoard({ boardId: updatedBoard._id, boardData: updatedBoard }));
+    dispatch(
+      updateBoard({ boardId: updatedBoard._id, boardData: updatedBoard })
+    );
     setIsModalOpen(false);
   };
 
@@ -95,7 +119,9 @@ function DashboardPage() {
 
   const handleToggleFavorite = (id, status) => {
     const newStatus = !status;
-    dispatch(updateBoard({ boardId: id, boardData: { isFavorite: newStatus } }));
+    dispatch(
+      updateBoard({ boardId: id, boardData: { isFavorite: newStatus } })
+    );
   };
 
   // Add Column submit handler
@@ -133,7 +159,11 @@ function DashboardPage() {
 
   // ------------------ Background ------------------
   let bgImage = null;
-  if (currentBoard && currentBoard.background && currentBoard.background !== "default") {
+  if (
+    currentBoard &&
+    currentBoard.background &&
+    currentBoard.background !== "default"
+  ) {
     const bgId = currentBoard.background;
     if (bgId.startsWith("custom_")) {
       bgImage = `url(${CLOUDINARY_BASE_URL}/q_auto,f_auto/${bgId})`;
@@ -145,154 +175,165 @@ function DashboardPage() {
 
   // ------------------ Render ------------------
   return (
-    <div className={styles.dashboardLayout}>
-      {/* Sidebar */}
-      <Sidebar
-        boards={userBoards}
-        onCreateNewBoard={openCreateModal}
-        isLoading={loadingBoards}
-        onDeleteBoard={openDeleteModal}
-        onEditBoard={handleEditBoard}
-        onToggleFavorite={handleToggleFavorite}
-        onLogout={handleLogout}
-        activeBoardId={currentBoard?._id}
-        onActiveBoardChange={handleActiveBoardChange}
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
+    <>
+      <Navbar />
+      <div className={styles.dashboardLayout}>
+        {/* Sidebar */}
+        <Sidebar
+          boards={userBoards}
+          onCreateNewBoard={openCreateModal}
+          isLoading={loadingBoards}
+          onDeleteBoard={openDeleteModal}
+          onEditBoard={handleEditBoard}
+          onToggleFavorite={handleToggleFavorite}
+          onLogout={handleLogout}
+          activeBoardId={currentBoard?._id}
+          onActiveBoardChange={handleActiveBoardChange}
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+        />
 
-      {/* Main Content */}
-      <main
-        className={styles.mainContent}
-        style={{
-          backgroundImage: bgImage,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          backgroundColor: bgImage ? "transparent" : "#f4f7f6",
-        }}
-      >
-        <header className={styles.mainHeader}>
-          <button className={styles.menuButton} onClick={toggleSidebar}>
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke={bgImage ? "#fff" : "#121212"}
-              strokeWidth="2"
-            >
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          </button>
+        {/* Main Content */}
+        <main
+          className={styles.mainContent}
+          style={{
+            backgroundImage: bgImage,
+            backgroundSize: "cover",
+            backgroundPosition: "top center",
+            backgroundRepeat: "no-repeat",
+            backgroundColor: bgImage ? "transparent" : "#f4f7f6",
+          }}
+        >
+          <header className={styles.mainHeader}>
+            <button className={styles.menuButton} onClick={toggleSidebar}>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke={bgImage ? "#fff" : "#121212"}
+                strokeWidth="2"
+              >
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
 
-          <h1
-            style={{
-              color: bgImage ? "#fff" : "#121212",
-              textShadow: bgImage ? "0 1px 4px rgba(0,0,0,0.8)" : "none",
-            }}
-          >
-            {currentBoard ? currentBoard.title : "Dashboard"}
-          </h1>
-        </header>
-
-        {/* Columns */}
-        {currentBoard ? (
-          <div className={styles.boardColumnsContainer}>
-            {/* 💡 Yükleniyor Durumu */}
-            {loadingColumns ? (
-              <p style={{ padding: "20px", color: bgImage ? "#fff" : "#121212" }}>Kolonlar Yükleniyor...</p>
-            ) : (
-              // 💡 Kolonlar Redux'tan alınan columnsData üzerinden render ediliyor
-              columnsData?.map(
-                (col) =>
-                  col && (
-                    <Column
-                      key={col._id}
-                      column={col}
-                      onEdit={handleEditColumn}
-                      onDelete={() => handleDeleteColumn(col._id)}
-                    />
-                  )
-              )
-            )}
-
-            {/* Add Column Button */}
-            <button
+            <h1
               style={{
-                minWidth: "335px",
-                height: "56px",
-                background: "#ffffff",
-                borderRadius: "8px",
-                border: "none",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                fontWeight: "500",
-                fontSize: "14px",
-                color: "#121212",
-                flexShrink: 0,
+                color: bgImage ? "#fff" : "#121212",
+                textShadow: bgImage ? "0 1px 4px rgba(0,0,0,0.8)" : "none",
               }}
-              onClick={() => setIsAddColumnModalOpen(true)}
-              disabled={loadingColumns} // Yüklenirken butonu devre dışı bırak
             >
-              <span
+              {currentBoard ? currentBoard.title : "Dashboard"}
+            </h1>
+          </header>
+
+          {/* Columns */}
+          {currentBoard ? (
+            <div className={styles.boardColumnsContainer}>
+              {/* 💡 Yükleniyor Durumu */}
+              {loadingColumns ? (
+                <p
+                  style={{
+                    padding: "20px",
+                    color: bgImage ? "#fff" : "#121212",
+                  }}
+                >
+                  Kolonlar Yükleniyor...
+                </p>
+              ) : (
+                // 💡 Kolonlar Redux'tan alınan columnsData üzerinden render ediliyor
+                columnsData?.map(
+                  (col) =>
+                    col && (
+                      <Column
+                        key={col._id}
+                        column={col}
+                        onEdit={handleEditColumn}
+                        onDelete={() => handleDeleteColumn(col._id)}
+                      />
+                    )
+                )
+              )}
+
+              {/* Add Column Button */}
+              <button
                 style={{
-                  background: "#121212",
-                  color: "#fff",
-                  borderRadius: "4px",
-                  width: "28px",
-                  height: "28px",
+                  minWidth: "335px",
+                  height: "56px",
+                  background: "#ffffff",
+                  borderRadius: "8px",
+                  border: "none",
+                  cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  gap: "8px",
+                  fontWeight: "500",
+                  fontSize: "14px",
+                  color: "#121212",
+                  flexShrink: 0,
                 }}
+                onClick={() => setIsAddColumnModalOpen(true)}
+                disabled={loadingColumns} // Yüklenirken butonu devre dışı bırak
               >
-                +
-              </span>
-              Add another column
-            </button>
+                <span
+                  style={{
+                    background: "#121212",
+                    color: "#fff",
+                    borderRadius: "4px",
+                    width: "28px",
+                    height: "28px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  +
+                </span>
+                Add another column
+              </button>
 
-            {/* Add Column Modal */}
-            {isAddColumnModalOpen && (
-              <AddColumnModal
-                isOpen={isAddColumnModalOpen}
-                onClose={() => setIsAddColumnModalOpen(false)}
-                onSubmit={handleAddColumn}
-              />
-            )}
-          </div>
-        ) : (
-          <div style={{ padding: "20px", color: bgImage ? "#fff" : "#000" }}>
-            Lütfen soldaki menüden bir board seçin veya yeni bir tane oluşturun.
-          </div>
+              {/* Add Column Modal */}
+              {isAddColumnModalOpen && (
+                <AddColumnModal
+                  isOpen={isAddColumnModalOpen}
+                  onClose={() => setIsAddColumnModalOpen(false)}
+                  onSubmit={handleAddColumn}
+                />
+              )}
+            </div>
+          ) : (
+            <div style={{ padding: "20px", color: bgImage ? "#fff" : "#000" }}>
+              Lütfen soldaki menüden bir board seçin veya yeni bir tane
+              oluşturun.
+            </div>
+          )}
+        </main>
+
+        {/* Modals */}
+        {isModalOpen && (
+          <NewBoardModal
+            onClose={() => setIsModalOpen(false)}
+            isEditMode={isEditMode}
+            initialData={boardToEdit}
+            onBoardCreated={handleBoardCreated}
+            onBoardUpdated={handleBoardUpdated}
+          />
         )}
-      </main>
 
-      {/* Modals */}
-      {isModalOpen && (
-        <NewBoardModal
-          onClose={() => setIsModalOpen(false)}
-          isEditMode={isEditMode}
-          initialData={boardToEdit}
-          onBoardCreated={handleBoardCreated}
-          onBoardUpdated={handleBoardUpdated}
-        />
-      )}
-
-      {isDeleteModalToOpen && (
-        <DeleteModal
-          isOpen={isDeleteModalToOpen}
-          onClose={() => setIsDeleteModalToOpen(false)}
-          onConfirm={confirmDeleteBoard}
-          title="Delete board"
-        />
-      )}
-    </div>
+        {isDeleteModalToOpen && (
+          <DeleteModal
+            isOpen={isDeleteModalToOpen}
+            onClose={() => setIsDeleteModalToOpen(false)}
+            onConfirm={confirmDeleteBoard}
+            title="Delete board"
+          />
+        )}
+      </div>
+    </>
   );
 }
 

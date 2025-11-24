@@ -1,9 +1,11 @@
 .taskPro {
   width: 100%; /*Uygulama alanını tanımlar*/
-  min-height: 100vh; /* Yüksekliği ekranı kaplayacak şekilde ayarlar */
   background-color: var(--primary-bg-color);
   display: flex; /*  Sidebar ve Nav/Content'i yan yana dizer */
   align-items: flex-start; /* İçeriği dikeyde üste hizalar */
+  position: fixed;
+  display: block;
+  z-index: 1;
 }
 .sidebar {
   background-color: var(--sidebar-color);

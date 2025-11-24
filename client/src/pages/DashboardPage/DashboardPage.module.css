@@ -100,8 +100,9 @@
 
   .mainContent {
     padding: 40px;
+    padding-top: 108px;
+    background: top center;
   }
-
   /* Hamburger gidince başlık en sola yapışmasın diye margin'i sıfırla */
   .mainHeader h1 {
     margin-left: 0;
