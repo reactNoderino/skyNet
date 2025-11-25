@@ -1,27 +1,29 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+require("dotenv").config();
 
-const protect = async (req, res, next) => {
-  let token;
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    token = req.headers.authorization.split(" ")[1];
+const authenticateUser = function (req, res, next) {
+  const authHeader = req.header("Authorization");
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Token yok, yetkilendirme reddedildi." });
   }
 
-  if (!token) {
-    return res.status(401).json({ message: "Token geçersiz" });
-  }
+  const token = authHeader.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { userId: decoded.userId };
+
+    req.user = decoded;
+
+    if (!req.user || !req.user.userId) {
+      throw new Error("Token, kullanıcı kimliği içermiyor.");
+    }
+
     next();
   } catch (err) {
-    console.error(err);
-    res.status(401).json({ message: "Token geçersiz" });
+    console.error("Token doğrulama hatası:", err.message);
+    res.status(401).json({ message: "Token geçerli değil." });
   }
 };
 
-module.exports = protect;
+module.exports = authenticateUser;

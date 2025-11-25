@@ -76,7 +76,10 @@ function Navbar({ user: initialUser }) {
           <div className={styles.themeSelector}>
             <div className={styles.themeContent} onClick={toggleThemeContent}>
               <p className={styles.themeTittle}>Theme</p>
-              <img src="/theme-arrow-icon.svg" />
+              <img
+                src="/theme-arrow-icon.svg"
+                className={styles.themeArrowIcon}
+              />
             </div>
             {themeContent && (
               <div className={styles.themeDropdown}>

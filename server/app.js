@@ -1,8 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+require("dotenv").config();
 
+const helpRoutes = require("./routes/helpRoutes");
 const authRoutes = require("./routes/authRoutes");
+const boardRoutes = require("./routes/boardRoutes");
+const columnRoutes = require("./routes/columnRoutes");
+const cardRoutes = require("./routes/cardRoutes");
 
 const app = express();
 const fs = require("fs");
@@ -43,7 +48,11 @@ app.use(cors(buildCorsConfig()));
 app.use(express.json({ limit: "1mb" }));
 app.use(morgan("dev"));
 
+app.use("/api/help", helpRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/boards", boardRoutes); // board + board-column
+app.use("/api/columns", columnRoutes); // column update/delete
+app.use("/api/cards", cardRoutes); // card CRUD + move
 
 app.use((req, res, next) => {
   const error = new Error("Kaynak bulunamadı");
@@ -51,7 +60,6 @@ app.use((req, res, next) => {
   next(error);
 });
 
-// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const response = {
