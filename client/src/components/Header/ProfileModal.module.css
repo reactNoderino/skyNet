@@ -1,0 +1,161 @@
+/* 1. Backdrop (Değişmez) */
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* 2. Modalın Kendisi */
+.modal {
+  width: 400px;
+  height: 440px;
+
+  /* ARKA PLAN: Temaya göre değişir */
+  background-color: var(--secondary-bg-color);
+  color: var(--text-icon-color); /* Varsayılan metin rengi */
+
+  border-radius: 8px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* 1. Edit Profile Başlığı */
+.modal h3 {
+  margin: 0;
+  padding: 24px 0 0 24px;
+  font-size: 18px;
+  font-family: var(--font-family);
+}
+
+/* 2. Avatar Konteyneri ve IMG Stilleri */
+.avatarContainer {
+  position: relative;
+  /* Dikey ortalama ve başlık altından 75px mesafe sağlamak için */
+  margin-top: 10px; /* 75px - 24px padding = 51px */
+  margin-left: auto;
+  margin-right: auto;
+  /* Ekstra stiller eklenmeli (width/height gibi) */
+}
+
+/* İkonun yerleştirildiği .editIcon için kullanılıyordu, eğer plus kullanıyorsanız: */
+.plus {
+  position: relative;
+  right: 45px;
+  top: 10px;
+}
+
+/* 3. Input ve Input Konteyneri Stilleri */
+.inputGroup {
+  margin: 10px auto;
+  width: 352px;
+  border-radius: 5px;
+}
+
+.inputGroup input {
+  width: 100%;
+  height: 49px;
+  box-sizing: border-box;
+  border-radius: 4px;
+
+  /* ARKA PLAN ve YAZI RENGİ: Temaya göre değişir */
+  background-color: var(--secondary-bg-color);
+  color: var(--text-icon-color);
+
+  /* NORMAL KENARLIK RENGİ: Temaya göre değişir */
+  border: 1px solid var(--border-color);
+
+  padding: 14px 18px 14px 18px;
+  font-size: 16px;
+}
+
+/* Input Focus (Tıklanma) Stili */
+.inputGroup input:focus {
+  outline: none;
+
+  border-color: var(
+    --accent-color
+  ); /* Vurgu rengini (Light/Dark'ta #5EAB73, Violet'te #5255BC) kullanır */
+}
+
+/* 4. Send Buton Stilleri */
+.buttonGroup {
+  margin: 20px auto 0;
+  width: 352px;
+  transition: filter 0.2s ease;
+}
+.buttonGroup button:hover {
+  /* Rengin %85'i kadar parlaklığını koru (Hafif koyu görünür) */
+  filter: brightness(0.85);
+}
+
+.buttonGroup button {
+  width: 100%;
+  height: 49px;
+
+  /* ARKA PLAN: Buton Rengi Temaya Göre Değişir */
+  background-color: var(--accent-color);
+
+  /* BUTON YAZI RENGİ: Modal Arka Plan Rengine Göre Değişir (Genellikle Beyaz/Siyah) */
+  color: var(--secondary-bg-color);
+
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  padding: 0;
+}
+
+/* mobil */
+
+/* Mobil Cihazlar İçin Medya Sorgusu (767px ve altı) */
+@media screen and (min-width: 320px) and (max-width: 767px) {
+  /* 1. Modalın Kendisi */
+
+  /* 2. Input ve Buton Konteynerleri */
+  .inputGroup,
+  .buttonGroup {
+    /* Input/Buton genişliği: 287px */
+    width: 287px;
+    margin: 10px auto; /* Ortalamak için */
+  }
+
+  /* 3. Input Alanları */
+  .inputGroup input {
+    /* Konteyneri doldurur (287px) */
+    width: 100%;
+    height: 49px; /* Uzunluk aynı kalır */
+    /* ... Diğer padding ve font stilleri aynı kalır ... */
+  }
+
+  /* 4. Send Butonu */
+  .buttonGroup button {
+    /* Konteyneri doldurur (287px) */
+    width: 100%;
+    height: 49px; /* Uzunluk aynı kalır */
+    /* ... Diğer hizalama stilleri aynı kalır ... */
+  }
+
+  /* Diğer elemanların konumlarını korumak için (Opsiyonel Kontrol) */
+  .modal h3 {
+    padding: 24px 0 0 24px;
+  }
+
+  .avatarContainer {
+    /* Ortada kalır */
+    margin-left: auto;
+    margin-right: auto;
+    /* ... diğer stiller ... */
+  }
+}

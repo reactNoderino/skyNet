@@ -1,11 +1,13 @@
-const validator = require('validator');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
-const User = require('../models/User');
-const generateToken = require('../utils/generateToken');
-const generateRefreshToken = require('../utils/generateRefreshToken');
-const sendPasswordResetEmail = require('../utils/sendPasswordResetEmail');
+const validator = require("validator");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const path = require("path");
+const multer = require("multer");
+const User = require("../models/User");
+const generateToken = require("../utils/generateToken");
+const generateRefreshToken = require("../utils/generateRefreshToken");
+const sendPasswordResetEmail = require("../utils/sendPasswordResetEmail");
 
 const buildUserResponse = (userDoc) => ({
   id: userDoc._id,
@@ -17,7 +19,7 @@ const buildUserResponse = (userDoc) => ({
 
 const normalizeEmailInput = (input) => {
   if (!input) {
-    return '';
+    return "";
   }
 
   const trimmed = input.trim();
@@ -52,22 +54,24 @@ const sendAuthResponse = async ({ res, user, statusCode, message }) => {
 
 const getClientBaseURL = () => {
   if (!process.env.CLIENT_URL) {
-    return 'http://localhost:3000';
+    return "http://localhost:3000";
   }
 
-  const [firstURL] = process.env.CLIENT_URL.split(',').map((item) => item.trim()).filter(Boolean);
-  return firstURL || 'http://localhost:3000';
+  const [firstURL] = process.env.CLIENT_URL.split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  return firstURL || "http://localhost:3000";
 };
 
 const verifyRefreshToken = async (refreshToken) => {
   if (!refreshToken) {
-    const error = new Error('Refresh token gereklidir');
+    const error = new Error("Refresh token gereklidir");
     error.statusCode = 400;
     throw error;
   }
 
   if (!process.env.JWT_REFRESH_SECRET) {
-    const error = new Error('JWT_REFRESH_SECRET tanımlı değil');
+    const error = new Error("JWT_REFRESH_SECRET tanımlı değil");
     error.statusCode = 500;
     throw error;
   }
@@ -75,7 +79,7 @@ const verifyRefreshToken = async (refreshToken) => {
   try {
     return jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
   } catch (err) {
-    const error = new Error('Geçersiz veya süresi dolmuş refresh token');
+    const error = new Error("Geçersiz veya süresi dolmuş refresh token");
     error.statusCode = 401;
     throw error;
   }
@@ -86,19 +90,25 @@ exports.register = async (req, res, next) => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-      return res.status(400).json({ message: 'İsim, e-posta ve şifre zorunludur' });
+      return res
+        .status(400)
+        .json({ message: "İsim, e-posta ve şifre zorunludur" });
     }
 
     const trimmedEmail = email.trim();
 
     if (!validator.isEmail(trimmedEmail)) {
-      return res.status(400).json({ message: 'Geçerli bir e-posta adresi giriniz' });
+      return res
+        .status(400)
+        .json({ message: "Geçerli bir e-posta adresi giriniz" });
     }
 
-    if (!validator.isStrongPassword(password, { minNumbers: 1, minSymbols: 0 })) {
+    if (
+      !validator.isStrongPassword(password, { minNumbers: 1, minSymbols: 0 })
+    ) {
       return res.status(400).json({
         message:
-          'Şifre en az 8 karakter olmalı, en az bir rakam ve en az bir büyük harf içermelidir',
+          "Şifre en az 8 karakter olmalı, en az bir rakam ve en az bir büyük harf içermelidir",
       });
     }
 
@@ -106,7 +116,9 @@ exports.register = async (req, res, next) => {
     const existingUser = await User.findOne({ email: normalizedEmail });
 
     if (existingUser) {
-      return res.status(409).json({ message: 'Bu e-posta ile kayıtlı kullanıcı bulunuyor' });
+      return res
+        .status(409)
+        .json({ message: "Bu e-posta ile kayıtlı kullanıcı bulunuyor" });
     }
 
     const user = await User.create({
@@ -119,7 +131,7 @@ exports.register = async (req, res, next) => {
       res,
       user,
       statusCode: 201,
-      message: 'Kullanıcı başarıyla oluşturuldu',
+      message: "Kullanıcı başarıyla oluşturuldu",
     });
   } catch (error) {
     next(error);
@@ -131,33 +143,41 @@ exports.login = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: 'E-posta ve şifre zorunludur' });
+      return res.status(400).json({ message: "E-posta ve şifre zorunludur" });
     }
 
     const trimmedEmail = email.trim();
 
     if (!validator.isEmail(trimmedEmail)) {
-      return res.status(400).json({ message: 'Geçerli bir e-posta adresi giriniz' });
+      return res
+        .status(400)
+        .json({ message: "Geçerli bir e-posta adresi giriniz" });
     }
 
     const normalizedEmail = normalizeEmailInput(trimmedEmail);
-    const user = await User.findOne({ email: normalizedEmail }).select('+password');
+    const user = await User.findOne({ email: normalizedEmail }).select(
+      "+password"
+    );
 
     if (!user) {
-      return res.status(401).json({ message: 'Email or password is incorrect' });
+      return res
+        .status(401)
+        .json({ message: "Email or password is incorrect" });
     }
 
     const isMatch = await user.comparePassword(password);
 
     if (!isMatch) {
-      return res.status(401).json({ message: 'Email or password is incorrect' });
+      return res
+        .status(401)
+        .json({ message: "Email or password is incorrect" });
     }
 
     await sendAuthResponse({
       res,
       user,
       statusCode: 200,
-      message: 'Başarıyla giriş yapıldı',
+      message: "Başarıyla giriş yapıldı",
     });
   } catch (error) {
     next(error);
@@ -169,23 +189,25 @@ exports.refreshToken = async (req, res, next) => {
     const { refreshToken } = req.body;
     const decoded = await verifyRefreshToken(refreshToken);
 
-    const user = await User.findById(decoded.userId).select('+refreshTokenHash');
+    const user = await User.findById(decoded.userId).select(
+      "+refreshTokenHash"
+    );
 
     if (!user || !user.refreshTokenHash) {
-      return res.status(401).json({ message: 'Refresh token doğrulanamadı' });
+      return res.status(401).json({ message: "Refresh token doğrulanamadı" });
     }
 
     const isMatch = await bcrypt.compare(refreshToken, user.refreshTokenHash);
 
     if (!isMatch) {
-      return res.status(401).json({ message: 'Refresh token doğrulanamadı' });
+      return res.status(401).json({ message: "Refresh token doğrulanamadı" });
     }
 
     await sendAuthResponse({
       res,
       user,
       statusCode: 200,
-      message: 'Token yenilendi',
+      message: "Token yenilendi",
     });
   } catch (error) {
     next(error);
@@ -197,15 +219,20 @@ exports.logout = async (req, res, next) => {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
-      return res.status(200).json({ message: 'Çıkış yapıldı' });
+      return res.status(200).json({ message: "Çıkış yapıldı" });
     }
 
     try {
       const decoded = await verifyRefreshToken(refreshToken);
-      const user = await User.findById(decoded.userId).select('+refreshTokenHash');
+      const user = await User.findById(decoded.userId).select(
+        "+refreshTokenHash"
+      );
 
       if (user && user.refreshTokenHash) {
-        const isMatch = await bcrypt.compare(refreshToken, user.refreshTokenHash);
+        const isMatch = await bcrypt.compare(
+          refreshToken,
+          user.refreshTokenHash
+        );
 
         if (isMatch) {
           user.refreshTokenHash = undefined;
@@ -219,7 +246,7 @@ exports.logout = async (req, res, next) => {
       // token geçersizse de çıkışı başarılı sayıyoruz
     }
 
-    res.status(200).json({ message: 'Çıkış yapıldı' });
+    res.status(200).json({ message: "Çıkış yapıldı" });
   } catch (error) {
     next(error);
   }
@@ -230,31 +257,40 @@ exports.forgotPassword = async (req, res, next) => {
     const { email } = req.body;
 
     if (!email) {
-      return res.status(400).json({ message: 'Geçerli bir e-posta adresi giriniz' });
+      return res
+        .status(400)
+        .json({ message: "Geçerli bir e-posta adresi giriniz" });
     }
 
     const trimmedEmail = email.trim();
 
     if (!validator.isEmail(trimmedEmail)) {
-      return res.status(400).json({ message: 'Geçerli bir e-posta adresi giriniz' });
+      return res
+        .status(400)
+        .json({ message: "Geçerli bir e-posta adresi giriniz" });
     }
 
     const normalizedEmail = normalizeEmailInput(trimmedEmail);
     const user = await User.findOne({ email: normalizedEmail });
-    const genericMessage = { message: 'Eğer e-posta kayıtlıysa, sıfırlama bağlantısı gönderildi' };
+    const genericMessage = {
+      message: "Eğer e-posta kayıtlıysa, sıfırlama bağlantısı gönderildi",
+    };
 
     if (!user) {
       return res.status(200).json(genericMessage);
     }
 
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetTokenHash = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
 
     user.passwordResetTokenHash = resetTokenHash;
     user.passwordResetTokenExpiry = Date.now() + 60 * 60 * 1000;
     await user.save({ validateBeforeSave: false });
 
-    const clientURL = getClientBaseURL().replace(/\/$/, '');
+    const clientURL = getClientBaseURL().replace(/\/$/, "");
     const resetURL = `${clientURL}/reset-password?token=${resetToken}`;
 
     try {
@@ -268,7 +304,7 @@ exports.forgotPassword = async (req, res, next) => {
       user.passwordResetTokenExpiry = undefined;
       await user.save({ validateBeforeSave: false });
 
-      const error = new Error('Şifre sıfırlama e-postası gönderilemedi');
+      const error = new Error("Şifre sıfırlama e-postası gönderilemedi");
       error.statusCode = 500;
       throw error;
     }
@@ -284,24 +320,33 @@ exports.resetPassword = async (req, res, next) => {
     const { token, password } = req.body;
 
     if (!token || !password) {
-      return res.status(400).json({ message: 'Token ve yeni şifre gereklidir' });
+      return res
+        .status(400)
+        .json({ message: "Token ve yeni şifre gereklidir" });
     }
 
-    if (!validator.isStrongPassword(password, { minNumbers: 1, minSymbols: 0 })) {
+    if (
+      !validator.isStrongPassword(password, { minNumbers: 1, minSymbols: 0 })
+    ) {
       return res.status(400).json({
         message:
-          'Şifre en az 8 karakter olmalı, en az bir rakam ve en az bir büyük harf içermelidir',
+          "Şifre en az 8 karakter olmalı, en az bir rakam ve en az bir büyük harf içermelidir",
       });
     }
 
-    const resetTokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const resetTokenHash = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
     const user = await User.findOne({
       passwordResetTokenHash: resetTokenHash,
       passwordResetTokenExpiry: { $gt: Date.now() },
-    }).select('+passwordResetTokenHash');
+    }).select("+passwordResetTokenHash");
 
     if (!user) {
-      return res.status(400).json({ message: 'Geçersiz veya süresi dolmuş token' });
+      return res
+        .status(400)
+        .json({ message: "Geçersiz veya süresi dolmuş token" });
     }
 
     user.password = password;
@@ -313,9 +358,37 @@ exports.resetPassword = async (req, res, next) => {
       res,
       user,
       statusCode: 200,
-      message: 'Şifreniz güncellendi',
+      message: "Şifreniz güncellendi",
     });
   } catch (error) {
     next(error);
+  }
+};
+
+exports.updateProfile = async (req, res) => {
+  try {
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
+    const user = await User.findById(req.user.userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const { name, email, password } = req.body;
+
+    if (name) user.name = name.trim();
+    if (email) user.email = normalizeEmailInput(email);
+    if (password) user.password = password;
+    if (req.file) user.avatarURL = `/uploads/${req.file.filename}`;
+
+    await user.save();
+
+    await sendAuthResponse({
+      res,
+      user,
+      statusCode: 200,
+      message: "Profile updated successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
   }
 };

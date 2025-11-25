@@ -1,9 +1,9 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import WelcomePage from './pages/WelcomePage/WelcomePage';
-import AuthPage from './pages/AuthPage/AuthPage';
-import HomePage from './pages/HomePage/HomePage';
-import ResetPasswordPage from './pages/ResetPasswordPage/ResetPasswordPage';
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import WelcomePage from "./pages/WelcomePage/WelcomePage";
+import AuthPage from "./pages/AuthPage/AuthPage";
+import HomePage from "./pages/HomePage/HomePage";
+import ResetPasswordPage from "./pages/ResetPasswordPage/ResetPasswordPage";
 
 function App() {
   return (
@@ -13,8 +13,7 @@ function App() {
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/home" element={<HomePage />} />
       {/*<Route path="/" element={<Navigate to="/welcome" replace />} />*/}
-          <Route path="/" element={<Navigate to="/home" replace />} />
-      
+      <Route path="/" element={<Navigate to="/home" replace />} />
     </Routes>
   );
 }
